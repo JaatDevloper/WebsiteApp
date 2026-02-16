@@ -49,7 +49,7 @@ app.use((req, res, next) => {
 // Export the app for Vercel serverless functions
 export default app;
 
-if (process.env.NODE_ENV !== "production") {
+if (!process.env.VERCEL) {
   (async () => {
     const server = await registerRoutes(app);
     

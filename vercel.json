@@ -10,22 +10,22 @@
       "use": "@vercel/static"
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "server/index.ts"
+      "src": "/api/(.*)",
+      "dest": "server/index.ts"
     },
     {
-      "source": "/health",
-      "destination": "server/index.ts"
+      "src": "/health",
+      "dest": "server/index.ts"
     },
     {
-      "source": "/assets/(.*)",
-      "destination": "/dist/public/assets/$1"
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
     },
     {
-      "source": "/(.*)",
-      "destination": "/dist/public/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
