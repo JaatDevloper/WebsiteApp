@@ -24,8 +24,6 @@ export class MongoStorage implements IStorage {
       username: profile.username || null,
       firstName: profile.first_name || null,
       lastName: profile.last_name || null,
-      email: (profile as any).email || null,
-      photoUrl: (profile as any).photo_url || null,
       createdAt: profile.created_at,
     };
   }
@@ -43,8 +41,6 @@ export class MongoStorage implements IStorage {
       username: profile.username || null,
       firstName: profile.first_name || null,
       lastName: profile.last_name || null,
-      email: (profile as any).email || null,
-      photoUrl: (profile as any).photo_url || null,
       createdAt: profile.created_at,
     };
   }
