@@ -46,6 +46,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// Export the app for Vercel serverless functions
+export default app;
+
 (async () => {
   const server = await registerRoutes(app);
 
