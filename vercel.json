@@ -6,22 +6,26 @@
       "use": "@vercel/node"
     },
     {
-      "src": "client/index.html",
+      "src": "dist/public/**/*",
       "use": "@vercel/static"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "server/index.ts"
+      "source": "/api/(.*)",
+      "destination": "server/index.ts"
     },
     {
-      "src": "/health",
-      "dest": "server/index.ts"
+      "source": "/health",
+      "destination": "server/index.ts"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/assets/(.*)",
+      "destination": "/dist/public/assets/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/dist/public/index.html"
     }
   ]
 }
