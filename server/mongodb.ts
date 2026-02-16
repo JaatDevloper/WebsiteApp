@@ -48,6 +48,8 @@ const userProfileSchema = new mongoose.Schema({
   username: String,
   first_name: String,
   last_name: String,
+  email: String,
+  photo_url: String,
   quizzes_taken: [{
     quiz_id: String,
     quiz_title: String,
