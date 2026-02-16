@@ -115,5 +115,9 @@ export class MemStorage implements IStorage {
 
 import { mongoStorage } from "./mongoStorage";
 
-// Use MongoDB storage instead of in-memory storage
-export const storage = mongoStorage;
+const useMemory = !process.env.MONGODB_URI;
+if (useMemory) {
+  console.log("⚠️ MONGODB_URI not set, using in-memory storage");
+}
+
+export const storage: IStorage = useMemory ? new MemStorage() : mongoStorage;

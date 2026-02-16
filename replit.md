@@ -92,5 +92,12 @@ Preferred communication style: Simple, everyday language.
 - `nanoid` — ID generation
 
 ### Deployment
-- Designed for Koyeb deployment (Docker-based) with environment variables for bot token, session secret, and database connections
+- Configured for Replit autoscale deployment
+- Build: `npm run build` (Vite frontend + esbuild server)
+- Run: `npm run start` (production Node.js server)
 - Port 5000 by default
+- MongoDB is optional: without `MONGODB_URI`, the app uses in-memory storage
+- Set `MONGODB_URI` and optionally `MONGODB_DB_NAME` as secrets for MongoDB support
+
+### Recent Changes
+- 2026-02-16: Initial Replit setup - configured workflow, deployment, MongoDB fallback to in-memory storage, added nanoid dependency, fixed tsconfig target for top-level await

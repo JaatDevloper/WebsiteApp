@@ -21,11 +21,10 @@ export default function Dashboard() {
   const userId = telegramUser?.id?.toString() || "7656415064"; // Hardcoded fallback for your account
   
   const { data: stats, isLoading } = useQuery<StatsData>({
-    queryKey: [`/api/stats?userId=${userId}`],
-    enabled: !!userId,
+    queryKey: ["/api/stats"],
   });
 
-  const userName = telegramUser?.first_name || "User";
+  const userName = "Guest";
 
   const handleStartLiveQuiz = () => {
     setLocation("/quizzes");

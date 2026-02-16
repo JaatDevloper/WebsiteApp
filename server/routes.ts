@@ -1,8 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { mongoStorage } from "./mongoStorage";
 import { insertUserSchema, insertQuizSchema, insertQuestionSchema } from "@shared/schema";
+
+const mongoStorage = process.env.MONGODB_URI
+  ? (await import("./mongoStorage")).mongoStorage
+  : null;
 import { z } from "zod";
 import multer from "multer";
 import { randomUUID } from "crypto";
@@ -64,18 +67,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/quizzes", async (req, res) => {
     try {
       const userId = req.query.userId as string;
-      console.log('📋 [API] Fetching quizzes for userId:', userId);
+      console.log('📋 [API] Fetching quizzes' + (userId ? ` for userId: ${userId}` : ' (all)'));
       
-      if (!userId) {
-        console.log('❌ [API] User ID missing in request');
-        return res.status(400).json({ error: "User ID required" });
-      }
-
       // Check if MongoDB is connected and if we are using mongoStorage
       console.log('🔍 [API] Using storage:', storage.constructor.name);
 
       const quizzes = await storage.getQuizzesByUserId(userId);
-      console.log(`✅ [API] Found ${quizzes.length} quizzes for user ${userId}`);
+      console.log(`✅ [API] Found ${quizzes.length} quizzes`);
       
       // Add question count to each quiz
       const quizzesWithCounts = await Promise.all(
@@ -173,13 +171,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/stats", async (req, res) => {
     try {
       const userId = req.query.userId as string;
-      console.log('📊 Fetching stats for userId:', userId);
+      console.log('📊 Fetching stats' + (userId ? ` for userId: ${userId}` : ' (all)'));
       
-      if (!userId) {
-        console.log('❌ User ID missing in stats request');
-        return res.status(400).json({ error: "User ID required" });
-      }
-
       const quizzes = await storage.getQuizzesByUserId(userId);
       const totalQuizzes = quizzes.length;
       const freeQuizzes = quizzes.filter(q => !q.isPaid).length;
@@ -272,6 +265,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         negativeMarking: z.number().optional(),
       }).parse(req.body);
 
+      if (!mongoStorage) {
+        return res.status(503).json({ error: "MongoDB not configured" });
+      }
       await mongoStorage.saveQuizAttempt(attemptData);
       res.status(201).json({ success: true, message: "Quiz attempt saved" });
     } catch (error) {
@@ -285,6 +281,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/quiz-attempts/:userId", async (req, res) => {
     try {
+      if (!mongoStorage) {
+        return res.json([]);
+      }
       const history = await mongoStorage.getUserQuizHistory(req.params.userId);
       res.json(history);
     } catch (error) {
@@ -296,6 +295,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Premium user check
   app.get("/api/premium/:userId", async (req, res) => {
     try {
+      if (!mongoStorage) {
+        return res.json({ isPremium: false });
+      }
       const isPremium = await mongoStorage.isPremiumUser(req.params.userId);
       res.json({ isPremium });
     } catch (error) {
@@ -307,6 +309,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user profile
   app.get("/api/user-profile/:userId", async (req, res) => {
     try {
+      if (!mongoStorage) {
+        return res.status(503).json({ error: "MongoDB not configured" });
+      }
       const profile = await mongoStorage.getUserProfile(req.params.userId);
       if (!profile) {
         return res.status(404).json({ error: "Profile not found" });
@@ -318,35 +323,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Telegram bot webhook endpoint
-  app.post("/webhook/telegram", async (req, res) => {
-    try {
-      const update = req.body;
-      console.log('📨 Received Telegram webhook:', JSON.stringify(update, null, 2));
-
-      // Process the webhook update
-      // This allows the Python bot to sync with the web app
-      if (update.message) {
-        const message = update.message;
-        const userId = message.from?.id;
-        
-        if (userId) {
-          // Auto-create/update user profile when bot interaction detected
-          await storage.createUser({
-            telegramId: userId.toString(),
-            username: message.from.username,
-            firstName: message.from.first_name,
-            lastName: message.from.last_name,
-          });
-        }
-      }
-
-      res.status(200).json({ ok: true });
-    } catch (error) {
-      console.error('Webhook error:', error);
-      res.status(500).json({ error: "Webhook processing failed" });
-    }
-  });
 
   // Health check
   app.get("/health", (req, res) => {

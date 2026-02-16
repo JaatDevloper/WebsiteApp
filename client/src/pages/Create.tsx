@@ -88,8 +88,8 @@ export default function Create() {
         title: "Quiz Created!",
         description: `Successfully created quiz with ${data.questionCount} questions.`,
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/quizzes?userId=${userId}`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/stats?userId=${userId}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/quizzes"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
       
       // Reset form
       setTitle("");
@@ -128,8 +128,8 @@ export default function Create() {
         title: "Quiz Imported!",
         description: `Successfully created quiz with ${data.questionCount} questions.`,
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/quizzes?userId=${userId}`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/stats?userId=${userId}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/quizzes"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
       
       // Reset form
       setTitle("");

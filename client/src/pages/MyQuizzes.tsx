@@ -24,8 +24,7 @@ export default function MyQuizzes() {
   const userId = telegramUser?.id?.toString() || "7656415064"; // Temporarily hardcoded for your specific account to ensure you see your 478 quizzes
   
   const { data: quizzes, isLoading } = useQuery<(Quiz & { questionCount: number })[]>({
-    queryKey: [`/api/quizzes?userId=${userId}`],
-    enabled: !!userId,
+    queryKey: ["/api/quizzes"],
   });
 
   const deleteMutation = useMutation({
@@ -33,8 +32,8 @@ export default function MyQuizzes() {
       return apiRequest('DELETE', `/api/quizzes/${quizId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/quizzes?userId=${userId}`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/stats?userId=${userId}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/quizzes"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
       toast({
         title: "Success",
         description: "Quiz deleted successfully",

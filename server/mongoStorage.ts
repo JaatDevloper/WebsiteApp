@@ -92,10 +92,10 @@ export class MongoStorage implements IStorage {
     };
   }
 
-  async getQuizzesByUserId(userId: string): Promise<QuizType[]> {
+  async getQuizzesByUserId(userId?: string): Promise<QuizType[]> {
     await this.ensureConnection();
     
-    const quizzes = await Quiz.find({ 
+    const query = userId ? { 
       $or: [
         { creator_id: userId },
         { creator_id: Number(userId) },
@@ -103,7 +103,9 @@ export class MongoStorage implements IStorage {
         { "questions.creator_id": userId },
         { "questions.creator_id": Number(userId) }
       ]
-    }).lean().sort({ created_at: -1 });
+    } : {};
+
+    const quizzes = await Quiz.find(query).lean().sort({ created_at: -1 });
 
     return (quizzes || []).map(quiz => {
       const id = (quiz as any).quiz_id || (quiz as any)._id?.toString() || 'unknown';
