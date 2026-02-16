@@ -110,6 +110,7 @@ export class MongoStorage implements IStorage {
     return (quizzes || []).map(quiz => {
       const id = (quiz as any).quiz_id || (quiz as any)._id?.toString() || 'unknown';
       const title = (quiz as any).title || (quiz as any).quiz_name || 'Untitled Quiz';
+      const qCreatorId = (quiz as any).creator_id || (quiz as any).creator || userId || 'unknown';
       
       let timer = (quiz as any).timer;
       if (timer === undefined && (quiz as any).questions && (quiz as any).questions.length > 0) {
@@ -118,7 +119,7 @@ export class MongoStorage implements IStorage {
 
       return {
         id,
-        userId: ((quiz as any).creator_id || userId).toString(),
+        userId: qCreatorId.toString(),
         title,
         description: (quiz as any).description || null,
         isPaid: (quiz as any).is_paid || false,
